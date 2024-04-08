@@ -3,10 +3,16 @@ import { hashPassword, matchPassword } from "../utils/auth";
 import { prisma } from "../utils/prismaClient";
 import { CustomError } from "../../error/CustomError";
 import jwt from "jsonwebtoken";
+import { sendMail } from "../emails/sendMail";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { first_name, last_name, email, password, role } = req.body;
+    // await sendMail(
+    //   email,
+    //   "Welcome to our platform!",
+    //   "<h1>Welcome to our platform!</h1>"
+    // );
     const hash = hashPassword(password);
     const user = await prisma.user.create({
       data: {

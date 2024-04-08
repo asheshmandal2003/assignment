@@ -60,8 +60,6 @@ export const isUser = async (
       },
     });
 
-    console.log(user);
-
     if (!user) {
       throw new CustomError(400, "User doesn't exist!");
     }

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import { prisma } from "../utils/prismaClient";
 import { CustomError } from "../../error/CustomError";
 import { LoginData, RegistrationData } from "../types/auth";
@@ -15,7 +15,11 @@ export const checkRegistrationData = async (
     const { first_name, last_name, email, password }: RegistrationData =
       req.body;
 
-    if (email === undefined || email.trim() === "") {
+    if (!email) {
+      throw new CustomError(400, "Email cannot be empty!");
+    } else if (typeof email !== "string") {
+      throw new CustomError(400, "Email must be a string!");
+    } else if (email.trim() === "") {
       throw new CustomError(400, "Email cannot be empty!");
     } else if (!EMAIL_REGEX.test(email)) {
       throw new CustomError(400, "Invalid email!");
@@ -30,11 +34,11 @@ export const checkRegistrationData = async (
       throw new CustomError(400, "Email already exists!");
     }
 
-    if (
-      first_name === undefined ||
-      first_name === null ||
-      first_name.trim() === ""
-    ) {
+    if (!first_name) {
+      throw new CustomError(400, "First name cannot be empty!");
+    } else if (typeof first_name !== "string") {
+      throw new CustomError(400, "First name must be a string!");
+    } else if (first_name.trim() === "") {
       throw new CustomError(400, "First name cannot be empty!");
     } else if (first_name.length < 3 || first_name.length > 50) {
       throw new CustomError(
@@ -43,11 +47,11 @@ export const checkRegistrationData = async (
       );
     }
 
-    if (
-      last_name === undefined ||
-      last_name === null ||
-      last_name.trim() === ""
-    ) {
+    if (!last_name) {
+      throw new CustomError(400, "Last name cannot be empty!");
+    } else if (typeof last_name !== "string") {
+      throw new CustomError(400, "Last name must be a string!");
+    } else if (last_name.trim() === "") {
       throw new CustomError(400, "Last name cannot be empty!");
     } else if (last_name.length < 3 || last_name.length > 50) {
       throw new CustomError(
@@ -56,7 +60,11 @@ export const checkRegistrationData = async (
       );
     }
 
-    if (password === undefined || password === null || password.trim() === "") {
+    if (!password) {
+      throw new CustomError(400, "Password cannot be empty!");
+    } else if (typeof password !== "string") {
+      throw new CustomError(400, "Password must be a string!");
+    } else if (password.trim() === "") {
       throw new CustomError(400, "Password cannot be empty!");
     } else if (password.length < 8 || password.length > 128) {
       throw new CustomError(
@@ -72,7 +80,9 @@ export const checkRegistrationData = async (
 
     next();
   } catch (err: any) {
-    return res.status(err.status).json({ msg: err.message });
+    return res
+      .status(err.status || 500)
+      .json({ msg: err.message } || { msg: "Internal server error!" });
   }
 };
 
@@ -84,13 +94,21 @@ export const checkLoginData = async (
   try {
     const { email, password }: LoginData = req.body;
 
-    if (email === undefined || email === null || email.trim() === "") {
+    if (!email) {
+      throw new CustomError(400, "Email cannot be empty!");
+    } else if (typeof email !== "string") {
+      throw new CustomError(400, "Email must be a string!");
+    } else if (email.trim() === "") {
       throw new CustomError(400, "Email cannot be empty!");
     } else if (!EMAIL_REGEX.test(email)) {
       throw new CustomError(400, "Invalid email!");
     }
 
-    if (password === undefined || password === null || password.trim() === "") {
+    if (!password) {
+      throw new CustomError(400, "Password cannot be empty!");
+    } else if (typeof password !== "string") {
+      throw new CustomError(400, "Password must be a string!");
+    } else if (password.trim() === "") {
       throw new CustomError(400, "Password cannot be empty!");
     } else if (password.length < 8 || password.length > 128) {
       throw new CustomError(
@@ -106,6 +124,8 @@ export const checkLoginData = async (
 
     next();
   } catch (err: any) {
-    return res.status(err.status).json({ msg: err.message });
+    return res
+      .status(err.status || 500)
+      .json({ msg: err.message } || { msg: "Internal server error!" });
   }
 };

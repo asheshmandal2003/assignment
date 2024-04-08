@@ -12,11 +12,11 @@ export const validateProfile = (
   try {
     const { first_name, last_name, email }: ProfileData = req.body;
 
-    if (
-      first_name === undefined ||
-      first_name === null ||
-      first_name.trim() === ""
-    ) {
+    if (!first_name) {
+      throw new CustomError(400, "First name cannot be empty!");
+    } else if (typeof first_name !== "string") {
+      throw new CustomError(400, "First name must be a string!");
+    } else if (first_name.trim() === "") {
       throw new CustomError(400, "First name cannot be empty!");
     } else if (first_name.length < 3 || first_name.length > 50) {
       throw new CustomError(
@@ -25,11 +25,11 @@ export const validateProfile = (
       );
     }
 
-    if (
-      last_name === undefined ||
-      last_name === null ||
-      last_name.trim() === ""
-    ) {
+    if (!last_name) {
+      throw new CustomError(400, "Last name cannot be empty!");
+    } else if (typeof last_name !== "string") {
+      throw new CustomError(400, "Last name must be a string!");
+    } else if (last_name.trim() === "") {
       throw new CustomError(400, "Last name cannot be empty!");
     } else if (last_name.length < 3 || last_name.length > 50) {
       throw new CustomError(
@@ -38,7 +38,11 @@ export const validateProfile = (
       );
     }
 
-    if (email === undefined || email === null || email.trim() === "") {
+    if (!email) {
+      throw new CustomError(400, "Email cannot be empty!");
+    } else if (typeof email !== "string") {
+      throw new CustomError(400, "Email must be a string!");
+    } else if (email.trim() === "") {
       throw new CustomError(400, "Email cannot be empty!");
     } else if (!EMAIL_REGEX.test(email)) {
       throw new CustomError(400, "Invalid email!");
@@ -46,6 +50,8 @@ export const validateProfile = (
 
     next();
   } catch (err: any) {
-    return res.status(err.status).json({ msg: err.message });
+    return res
+      .status(err.status || 500)
+      .json({ msg: err.message || "Internal Server Error!" });
   }
 };
