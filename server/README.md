@@ -48,6 +48,10 @@
    docker build -t myapp:1.0 .
    ```
 
-3. docker run myapp:1.0
+3.Run the docker image
+
+```shell
+ docker run myapp:1.0
+```
 
 4. Now the server will listen on port 8080
