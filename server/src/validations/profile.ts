@@ -55,3 +55,27 @@ export const validateProfile = (
       .json({ msg: err.message || "Internal Server Error!" });
   }
 };
+
+export const validateProfilePhoto = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.file) {
+      throw new CustomError(400, "Please upload a file!");
+    }
+
+    const { prevFilename } = req.body;
+
+    if (!prevFilename) {
+      throw new CustomError(400, "Previous file name is required!");
+    }
+
+    next();
+  } catch (err: any) {
+    return res
+      .status(err.status || 500)
+      .json({ msg: err.message || "Internal Server Error!" });
+  }
+};

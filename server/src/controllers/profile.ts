@@ -3,6 +3,7 @@ import { prisma } from "../utils/prismaClient";
 import { ProfileData } from "../types/profile";
 import { CustomError } from "../../error/CustomError";
 import { isNullId } from "../utils/nullCheck";
+import cloudinary from "../../cloudinary";
 
 export const getProfile = async (req: Request, res: Response) => {
   try {
@@ -58,6 +59,41 @@ export const updateProfile = async (req: Request, res: Response) => {
       },
     });
     return res.status(200).json({ msg: "Profile updated!" });
+  } catch (err: any) {
+    return res
+      .status(err.status || 500)
+      .json({ msg: err.message || "Something went wrong!" });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const updateProfilePhoto = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (isNullId(id)) {
+      throw new CustomError(404, "User not found!");
+    }
+    const { prevFilename } = req.body;
+
+    await cloudinary.uploader.destroy(prevFilename);
+
+    await prisma.user.update({
+      select: {
+        id: true,
+      },
+      where: {
+        id,
+      },
+      data: {
+        path: req.file?.path,
+        filename: req.file?.filename,
+      },
+    });
+    return res
+      .status(200)
+      .json({ path: req.file?.path, filename: req.file?.filename });
   } catch (err: any) {
     return res
       .status(err.status || 500)

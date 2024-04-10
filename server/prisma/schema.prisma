@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
 }
 
 datasource db {
@@ -17,6 +17,8 @@ model User {
   id         String    @id @default(uuid())
   first_name String
   last_name  String
+  path       String?
+  filename   String?
   email      String    @unique
   password   String
   role       Role      @default(USER)
@@ -24,6 +26,7 @@ model User {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   lastLogin  DateTime?
+  verified   Boolean   @default(false)
 
   @@index([email])
 }
@@ -37,6 +40,16 @@ model Course {
   enrolledBy  User[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
 }
 
 enum Role {

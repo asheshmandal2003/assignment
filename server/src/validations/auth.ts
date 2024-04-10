@@ -2,6 +2,7 @@ import e, { NextFunction, Request, Response } from "express";
 import { prisma } from "../utils/prismaClient";
 import { CustomError } from "../../error/CustomError";
 import { LoginData, RegistrationData } from "../types/auth";
+import cloudinary from "../../cloudinary";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[A-Z]).{8,}$/;
@@ -80,6 +81,9 @@ export const checkRegistrationData = async (
 
     next();
   } catch (err: any) {
+    if (req.file?.filename) {
+      await cloudinary.uploader.destroy(req.file.filename);
+    }
     return res
       .status(err.status || 500)
       .json({ msg: err.message } || { msg: "Internal server error!" });
